@@ -131,6 +131,9 @@ module Jennifer
       def self.select_clause(io : String::Builder, query, exact_fields : Array = [] of String)
         io << "SELECT "
         io << "DISTINCT " if query._distinct
+        if query._distinct_on
+          io << "DISTINCT ON (" << query._distinct_on << ") "
+        end
         if !query._raw_select
           table = query._table
           if !exact_fields.empty?
