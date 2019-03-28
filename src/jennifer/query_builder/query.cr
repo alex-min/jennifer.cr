@@ -12,7 +12,7 @@ module Jennifer
       include Joining
       include Executables
 
-      {% for method in %i(having table limit offset raw_select table_aliases from lock joins order relations groups lock unions distinct) %}
+      {% for method in %i(having table limit offset raw_select table_aliases from lock joins order relations groups lock unions distinct distinct_on) %}
         def _{{method.id}}
           @{{method.id}}
         end
@@ -28,6 +28,7 @@ module Jennifer
       @having : Condition | LogicOperator?
       @limit : Int32?
       @distinct : Bool = false
+      @distinct_on : String? = nil
       @offset : Int32?
       @raw_select : String?
       @from : String | Query?
@@ -63,7 +64,7 @@ module Jennifer
       end
 
       protected def initialize_copy_without(other, except : Array(String))
-        {% for segment in %w(having limit offset raw_select from lock distinct) %}
+        {% for segment in %w(having limit offset raw_select from lock distinct distinct_on) %}
           @{{segment.id}} = other.@{{segment.id}}.clone unless except.includes?({{segment}})
         {% end %}
 
@@ -252,6 +253,11 @@ module Jennifer
 
       def union(query)
         (@unions ||= [] of Query) << query
+        self
+      end
+
+      def distinct_on(column : Symbol)
+        @distinct_on = column.to_s
         self
       end
 
