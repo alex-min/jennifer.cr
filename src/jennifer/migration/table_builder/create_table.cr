@@ -45,11 +45,11 @@ module Jennifer
         # Defines foreign key field based on given relation name (*name*). By default it is integer and null value is allowed.
         #
         # If *polymorphic* is `true` - additional string field `"#{name}_type"` is created and foreign key is not added.
-        def reference(name, to_table = Inflector.pluralize(name), primary_key = nil, key_name = nil, polymorphic : Bool = false)
+        def reference(name, to_table = Inflector.pluralize(name), primary_key = nil, key_name = nil, polymorphic : Bool = false, null = true)
           column = Inflector.foreign_key(name)
-          integer(column, { :type => :integer, :null => true })
+          integer(column, { :type => :uuid, :null => null })
           if polymorphic
-            string("#{name}_type", { :null => true })
+            string("#{name}_type", { :null => null })
           else
             foreign_key(to_table, column, primary_key, key_name)
           end
